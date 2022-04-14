@@ -1,6 +1,8 @@
 package com.regisbackend.regisbackend.common;
 
 import lombok.Data;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,11 +12,19 @@ import java.util.Map;
  */
 @Data
 public class Result<T> {
-
+    /**
+     * 响应状态码
+     */
     private Integer code;
 
+    /**
+     * 提示信息
+     */
     private String message;
 
+    /**
+     * 响应数据
+     */
     private T data;
 
     private Map map = new HashMap();
@@ -22,7 +32,7 @@ public class Result<T> {
     public static <T> Result<T> success(T object) {
         Result<T> result = new Result<>();
         result.data = object;
-        result.code = 200;
+        result.code =200;
         return result;
     }
 
