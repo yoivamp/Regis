@@ -36,6 +36,7 @@
           </div>
 
           <el-scrollbar wrap-class="scrollbar-wrapper">
+          <!--管理选项-->
             <el-menu
               :default-active="defAct"
               :unique-opened="false"
@@ -50,6 +51,7 @@
                     <i class="iconfont" :class="item.icon"></i>
                     <span>{{item.name}}</span>
                   </template>
+
                   <el-menu-item
                     v-for="sub in item.children"
                     :index="sub.id"
@@ -61,6 +63,8 @@
                     </el-menu-item
                   >
                 </el-submenu>
+
+                <!--内部管理-->
                 <el-menu-item v-else :index="item.id" @click="menuHandle(item,false)">
                   <i class="iconfont" :class="item.icon"></i>
                   <span slot="title">{{item.name}}</span>
@@ -70,6 +74,7 @@
           </el-scrollbar>
         </div>
         <div class="main-container">
+
           <!-- <navbar /> -->
           <div class="navbar">
             <div class="head-lable">
@@ -78,6 +83,8 @@
               >
               <span>{{headTitle}}</span>
             </div>
+
+          <!--管理页面-->
             <div class="right-menu">
               <div class="avatar-wrapper">{{ userInfo.name }}</div>
               <!-- <div class="logout" @click="logout">退出</div> -->
@@ -100,6 +107,9 @@
         </div>
       </div>
     </div>
+
+
+
     <!-- 开发环境版本，包含了有帮助的命令行警告 -->
     <script src="plugins/vue/vue.js"></script>
     <!-- 引入组件库 -->
@@ -108,6 +118,8 @@
     <script src="plugins/axios/axios.min.js"></script>
     <script src="js/request.js"></script>
     <script src="api/login.js"></script>
+
+
     <script>
 
       new Vue({
@@ -180,7 +192,7 @@
         methods: {
           logout() {
             logoutApi().then((res)=>{
-              if(res.code === 1){
+              if(res.code === 200){
                 localStorage.removeItem('userInfo')
                 window.location.href = '/backend/page/login/login.html'
               }

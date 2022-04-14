@@ -21,10 +21,10 @@
     <!--依赖管理-->
     <dependencies>
         <!--security安全管理-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
+        <!--<dependency>-->
+        <!--    <groupId>org.springframework.boot</groupId>-->
+        <!--    <artifactId>spring-boot-starter-security</artifactId>-->
+        <!--</dependency>-->
 
         <!--web管理-->
         <dependency>
@@ -54,11 +54,11 @@
         </dependency>
 
         <!--security-test-->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+        <!--    <groupId>org.springframework.security</groupId>-->
+        <!--    <artifactId>spring-security-test</artifactId>-->
+        <!--    <scope>test</scope>-->
+        <!--</dependency>-->
 
         <!--集成mybatis-plus-->
         <dependency>
