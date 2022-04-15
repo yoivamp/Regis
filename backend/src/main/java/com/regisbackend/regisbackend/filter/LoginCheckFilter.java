@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * 静态资源过滤器
  * @author 喵vamp
  */
 @WebFilter(filterName = "loginCheckFilter", urlPatterns = "/*")
