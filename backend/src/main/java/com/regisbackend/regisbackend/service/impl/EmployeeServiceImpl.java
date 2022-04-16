@@ -15,7 +15,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
 /**
  * @author 喵vamp
@@ -61,14 +60,13 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     /**
      * 新增员工
      *
-     * @param request  获取创建者和更新者id
      * @param employee 新员工信息
      * @return 添加操作结果
      */
-    public Result<String> save(HttpServletRequest request, @RequestBody Employee employee) {
+    public Result<String> saveEmployee(@RequestBody Employee employee) {
         log.info("新增员工信息：{}", employee.toString());
         //员工信息初始化
-        EmployeeInit.init(request, employee);
+        EmployeeInit.init(employee);
         //新增员工
         return save(employee) ? Result.success("添加员工成功") : null;
     }
@@ -96,6 +94,12 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         return Result.success(pages);
     }
 
+    /**
+     * 根据员工id查询员工信息
+     *
+     * @param id 员工id
+     * @return 员工信息
+     */
     public Result<Employee> getEmployeeId(Long id) {
         log.info("根据id查询员工信息");
         //获取员工id
@@ -103,21 +107,14 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         return employee != null ? Result.success(employee) : Result.error("没有查询到对应的员工信息");
     }
 
-
     /**
      * 更新员工信息
      *
-     * @param request  获取更新时间和id
      * @param employee 更新的员工信息
      * @return 更新结果
      */
-    public Result<String> updateEmployee(HttpServletRequest request, @RequestBody Employee employee) {
+    public Result<String> updateEmployee(@RequestBody Employee employee) {
         log.info(employee.toString());
-        //获取修改员工id
-        Long emdId = (Long) request.getSession().getAttribute("employee");
-        //设置更新时间和更新者
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(emdId);
         return updateById(employee) ? Result.success("员工信息修改成功") : null;
     }
 }

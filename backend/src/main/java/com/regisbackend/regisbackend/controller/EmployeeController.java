@@ -51,13 +51,12 @@ public class EmployeeController {
     /**
      * 新增员工
      *
-     * @param request  获取创建者和更新者id
      * @param employee 新员工信息
      * @return 添加操作结果
      */
     @PostMapping
-    public Result<String> save(HttpServletRequest request, @RequestBody Employee employee) {
-        return empServiceImpl.save(request, employee);
+    public Result<String> save(@RequestBody Employee employee) {
+        return empServiceImpl.saveEmployee(employee);
     }
 
     /**
@@ -73,6 +72,12 @@ public class EmployeeController {
         return empServiceImpl.getPage(page, pageSize, name);
     }
 
+    /**
+     * 根据员工id查询员工信息
+     *
+     * @param id 员工id
+     * @return 员工信息
+     */
     @GetMapping("/{id}")
     public Result<Employee> getById(@PathVariable("id") Long id) {
         return empServiceImpl.getEmployeeId(id);
@@ -81,13 +86,12 @@ public class EmployeeController {
     /**
      * 更新员工信息
      *
-     * @param request  获取更新时间和id
      * @param employee 更新的员工信息
      * @return 更新结果
      */
     @PutMapping
-    public Result<String> update(HttpServletRequest request, @RequestBody Employee employee) {
-        return empServiceImpl.updateEmployee(request, employee);
+    public Result<String> update(@RequestBody Employee employee) {
+        return empServiceImpl.updateEmployee(employee);
     }
 
 }
