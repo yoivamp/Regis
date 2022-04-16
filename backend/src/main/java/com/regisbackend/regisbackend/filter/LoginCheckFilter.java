@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+<<<<<<< HEAD
+=======
+ * 静态资源过滤器
+>>>>>>> hotfix-status
  * @author 喵vamp
  */
 @WebFilter(filterName = "loginCheckFilter", urlPatterns = "/*")
