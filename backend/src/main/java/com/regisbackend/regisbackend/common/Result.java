@@ -2,7 +2,6 @@ package com.regisbackend.regisbackend.common;
 
 import lombok.Data;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
