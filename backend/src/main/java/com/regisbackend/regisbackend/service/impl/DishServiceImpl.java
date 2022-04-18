@@ -125,8 +125,44 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         return Result.success(dishDto);
     }
 
+
+    /**
+     * 查询所有可用菜品
+     * @param dish 菜品
+     * @return 查询结果
+     */
+    @Override
+    public Result<List<DishDto>> listWithInsert(Dish dish) {
+        //条件构造器
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        //添加查询条件(菜品名称，菜品分类id，菜品起售状态，更新时间排序)
+        queryWrapper.like(Strings.isNotEmpty(dish.getName()), Dish::getName, dish.getName());
+        queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        queryWrapper.eq(Dish::getStatus, 1);
+        queryWrapper.orderByDesc(Dish::getUpdateTime);
+        //执行查询获取菜品列表
+        List<Dish> dishList = this.list(queryWrapper);
+
+        List<DishDto> dishDtos = dishList.stream().map(item -> {
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(item, dishDto);
+            Category category = categoryMapper.selectById(item.getCategoryId());
+            if (category != null) {
+                dishDto.setCategoryName(category.getName());
+            }
+            LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(DishFlavor::getDishId, item.getId());
+
+            dishDto.setFlavors(dishFlavorService.list(wrapper));
+            return dishDto;
+        }).collect(Collectors.toList());
+
+        return Result.success(dishDtos);
+    }
+
     /**
      * 修改菜品信息
+     *
      * @param dishDto 新增的菜品信息
      * @return 修改结果
      */

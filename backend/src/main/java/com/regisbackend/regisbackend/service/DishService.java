@@ -5,7 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.dto.DishDto;
 import com.regisbackend.regisbackend.pojo.Dish;
-import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * @author 喵vamp
@@ -37,6 +38,14 @@ public interface DishService extends IService<Dish> {
      * @return 回显信息
      */
     Result<DishDto> getByIdWithFlavor(Long id);
+
+
+    /**
+     * 查询所有可用菜品
+     * @param dish 菜品
+     * @return 查询结果
+     */
+    Result<List<DishDto>> listWithInsert(Dish dish);
 
     /**
      * 修改菜品信息

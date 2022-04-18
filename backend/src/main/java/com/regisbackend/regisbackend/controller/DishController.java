@@ -3,12 +3,17 @@ package com.regisbackend.regisbackend.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.dto.DishDto;
+import com.regisbackend.regisbackend.pojo.Dish;
 import com.regisbackend.regisbackend.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
+ * 菜品管理
+ *
  * @author 喵vamp
  */
 @RestController
@@ -54,7 +59,19 @@ public class DishController {
     }
 
     /**
+     * 查询所有可用菜品
+     * @param dish 菜品
+     * @return 查询结果
+     */
+    @GetMapping("/list")
+    public Result<List<DishDto>> list(Dish dish) {
+        return dishService.listWithInsert(dish);
+    }
+
+
+    /**
      * 修改菜品信息
+     *
      * @param dishDto 新增的菜品信息
      * @return 修改结果
      */

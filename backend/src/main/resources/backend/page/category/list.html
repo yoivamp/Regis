@@ -44,7 +44,7 @@
                     label="分类类型"
             >
                 <template slot-scope="scope">
-                    <span>{{ scope.row.type === '1' ? '菜品分类' : '套餐分类' }}</span>
+                    <span>{{ scope.row.type === 1 ? '菜品分类' : '套餐分类' }}</span>
                 </template>
             </el-table-column>
             <el-table-column
@@ -277,7 +277,7 @@
                                 this.classData.dialogVisible = false
                                 this.handleQuery()
                             } else {
-                                this.$message.error(res.msg || '操作失败')
+                                this.$message.error(res.message || '操作失败')
                             }
                         }).catch(err => {
                             this.$message.error('请求出错了：' + err)
