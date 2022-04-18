@@ -15,6 +15,9 @@ import com.regisbackend.regisbackend.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @author 喵vamp
@@ -36,6 +39,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      * @param category 分类信息
      * @return 新增结果
      */
+    @Override
     public Result<String> saveCategory(Category category) {
         log.info("category:{}", category);
         return save(category) ? Result.success("新增分类成功") : null;
@@ -48,6 +52,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      * @param pageSize 每页条目数
      * @return 查询数据
      */
+    @Override
     public Result<Page<Category>> pageCategory(int page, int pageSize) {
         //创建分页构造器
         Page<Category> categoryPage = new Page<>(page, pageSize);
@@ -61,11 +66,30 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     }
 
     /**
+     * 返回菜品分类
+     * @param category 分类信息
+     * @return 分类列表
+     */
+    @Override
+    public Result<List<Category>> getCategoryList(Category category) {
+        //条件构造器
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
+        //添加条件
+        queryWrapper.eq(category.getType() != null, Category::getType, category.getType());
+        //添加排序条件
+        queryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
+        //返回结果
+        List<Category> list = list(queryWrapper);
+        return list != null ? Result.success(list) : null;
+    }
+
+    /**
      * 删除分类信息
      *
      * @param id 分类信息id
      * @return 删除结果
      */
+    @Override
     public Result<String> deleteCategory(Long id) {
         //查询当前分类是否关联了菜品，如果已经关联，抛出一个业务异常
         LambdaQueryWrapper<Dish> dishQueryWrapper = new LambdaQueryWrapper<>();
@@ -91,6 +115,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      * @param category 更新后的员工信息
      * @return 修改结果
      */
+    @Override
+    @Transactional
     public Result<String> updateCategory(Category category) {
         log.info("修改分类信息：{}", category);
         return updateById(category) ? Result.success("修改分类信息成功") : null;

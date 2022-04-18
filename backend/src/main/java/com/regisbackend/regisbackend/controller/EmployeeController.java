@@ -3,7 +3,7 @@ package com.regisbackend.regisbackend.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.pojo.Employee;
-import com.regisbackend.regisbackend.service.impl.EmployeeServiceImpl;
+import com.regisbackend.regisbackend.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 员工管理
+ *
  * @author 喵vamp
  */
 @RestController
@@ -22,7 +23,7 @@ public class EmployeeController {
      * employee的service的impl
      */
     @Autowired
-    private EmployeeServiceImpl empServiceImpl;
+    private EmployeeService empService;
 
     /**
      * 登录操作
@@ -33,7 +34,7 @@ public class EmployeeController {
      */
     @PostMapping("/login")
     public Result<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
-        return empServiceImpl.login(request, employee);
+        return empService.login(request, employee);
     }
 
     /**
@@ -57,7 +58,7 @@ public class EmployeeController {
      */
     @PostMapping
     public Result<String> save(@RequestBody Employee employee) {
-        return empServiceImpl.saveEmployee(employee);
+        return empService.saveEmployee(employee);
     }
 
     /**
@@ -70,7 +71,7 @@ public class EmployeeController {
      */
     @GetMapping("/page")
     public Result<Page<Employee>> page(int page, int pageSize, String name) {
-        return empServiceImpl.getPage(page, pageSize, name);
+        return empService.getPage(page, pageSize, name);
     }
 
     /**
@@ -81,7 +82,7 @@ public class EmployeeController {
      */
     @GetMapping("/{id}")
     public Result<Employee> getById(@PathVariable("id") Long id) {
-        return empServiceImpl.getEmployeeId(id);
+        return empService.getEmployeeId(id);
     }
 
     /**
@@ -92,7 +93,7 @@ public class EmployeeController {
      */
     @PutMapping
     public Result<String> update(@RequestBody Employee employee) {
-        return empServiceImpl.updateEmployee(employee);
+        return empService.updateEmployee(employee);
     }
 
 }

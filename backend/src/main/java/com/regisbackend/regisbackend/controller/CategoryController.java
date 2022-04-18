@@ -3,10 +3,12 @@ package com.regisbackend.regisbackend.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.pojo.Category;
-import com.regisbackend.regisbackend.service.impl.CategoryServiceImpl;
+import com.regisbackend.regisbackend.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 分类管理
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class CategoryController {
     @Autowired
-    private CategoryServiceImpl categoryImpl;
+    private CategoryService categoryService;
 
     /**
      * 新增分类
@@ -28,7 +30,7 @@ public class CategoryController {
      */
     @PostMapping
     public Result<String> save(@RequestBody Category category) {
-        return categoryImpl.saveCategory(category);
+        return categoryService.saveCategory(category);
     }
 
     /**
@@ -40,7 +42,17 @@ public class CategoryController {
      */
     @GetMapping("/page")
     public Result<Page<Category>> page(int page, int pageSize) {
-        return categoryImpl.pageCategory(page, pageSize);
+        return categoryService.pageCategory(page, pageSize);
+    }
+
+    /**
+     * 返回菜品分类
+     * @param category 分类信息
+     * @return 分类列表
+     */
+    @GetMapping("/list")
+    public Result<List<Category>> getCategoryList(Category category) {
+        return categoryService.getCategoryList(category);
     }
 
     /**
@@ -51,16 +63,17 @@ public class CategoryController {
      */
     @DeleteMapping
     public Result<String> delete(Long id) {
-        return categoryImpl.deleteCategory(id);
+        return categoryService.deleteCategory(id);
     }
 
     /**
      * 修改分类信息
+     *
      * @param category 更新后的员工信息
      * @return 修改结果
      */
     @PutMapping
-    public Result<String> update(@RequestBody Category category){
-        return categoryImpl.updateCategory(category);
+    public Result<String> update(@RequestBody Category category) {
+        return categoryService.updateCategory(category);
     }
 }

@@ -13,7 +13,7 @@ spring:
 
 #文件位置
 regis:
-  path: D:\pause\
+  path: D:\pause\regis-img\
 
 
 #MP配置
