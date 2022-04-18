@@ -1,10 +1,47 @@
 package com.regisbackend.regisbackend.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.regisbackend.regisbackend.common.Result;
+import com.regisbackend.regisbackend.dto.DishDto;
 import com.regisbackend.regisbackend.pojo.Dish;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * @author 喵vamp
  */
 public interface DishService extends IService<Dish> {
+
+    /**
+     * 新增菜品
+     *
+     * @param dishDto 菜品信息
+     * @return 添加结果
+     */
+    Result<String> saveWithFlavor(DishDto dishDto);
+
+    /**
+     * 菜品分页查询
+     *
+     * @param page     当前页码
+     * @param pageSize 每页条目数
+     * @param name     查询菜品名称
+     * @return 查询结果
+     */
+    Result<Page<DishDto>> pageDish(int page, int pageSize, String name);
+
+
+    /**
+     * 根据id回显菜品信息
+     * @param id 菜品id
+     * @return 回显信息
+     */
+    Result<DishDto> getByIdWithFlavor(Long id);
+
+    /**
+     * 修改菜品信息
+     * @param dishDto 新增的菜品信息
+     * @return 修改结果
+     */
+    Result<String> updateWithFlavor(DishDto dishDto);
 }

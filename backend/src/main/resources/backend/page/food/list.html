@@ -60,7 +60,7 @@
             :src="getImage(row.image)" 
             :preview-src-list="[ `/common/download?name=${row.image}` ]" >
             <div slot="error" class="image-slot">
-              <img src="../../images/noImg.png" style="width: auto; height: 40px; border:none;" >
+              <img src="../../images/noImg.png" style="width: auto; height: 40px; border:none;"  alt="">
             </div>  
           </el-image>
           </template>
@@ -76,7 +76,7 @@
         </el-table-column>
         <el-table-column label="售卖状态">
           <template slot-scope="scope">
-            <span style="margin-right: 10px;">{{ scope.row.status == '0' ? '停售' : '启售' }}</span>
+            <span style="margin-right: 10px;">{{ scope.row.status === '0' ? '停售' : '启售' }}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -104,7 +104,7 @@
               class="blueBug"
               @click="statusHandle(scope.row)"
             >
-              {{ scope.row.status == '0' ? '启售' : '停售' }}
+              {{ scope.row.status === '0' ? '启售' : '停售' }}
             </el-button>
             <el-button
               type="text"
@@ -165,7 +165,7 @@
               name: this.input ? this.input : undefined
             }
             await getDishPage(params).then(res => {
-              if (String(res.code) === '1') {
+              if (res.code === 200) {
                 this.tableData = res.data.records || []
                 this.counts = res.data.total
               }
@@ -209,11 +209,11 @@
               'cancelButtonText': '取消',
             }).then(() => {
               deleteDish(type === '批量' ? this.checkList.join(',') : id).then(res => {
-                if (res.code === 1) {
+                if (res.code === 200) {
                   this.$message.success('删除成功！')
                   this.handleQuery()
                 } else {
-                  this.$message.error(res.msg || '操作失败')
+                  this.$message.error(res.message || '操作失败')
                 }
               }).catch(err => {
                 this.$message.error('请求出错了：' + err)
@@ -243,11 +243,11 @@
             }).then(() => {
               // 起售停售---批量起售停售接口
               dishStatusByStatus(this.dishState).then(res => {
-                if (res.code === 1) {
+                if (res.code === 200) {
                   this.$message.success('菜品状态已经更改成功！')
                   this.handleQuery()
                 } else {
-                  this.$message.error(res.msg || '操作失败')
+                  this.$message.error(res.message || '操作失败')
                 }
               }).catch(err => {
                   this.$message.error('请求出错了：' + err)

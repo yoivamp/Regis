@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  菜品
+ * @author 喵vamp
  */
 @Data
 public class Dish implements Serializable {
