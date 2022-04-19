@@ -3,6 +3,7 @@ package com.regisbackend.regisbackend.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.regisbackend.regisbackend.common.CustomException;
 import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.dao.CategoryMapper;
 import com.regisbackend.regisbackend.dao.DishMapper;
@@ -125,8 +126,60 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         return Result.success(dishDto);
     }
 
+
+    /**
+     * 查询所有可用菜品
+     *
+     * @param dish 菜品
+     * @return 查询结果
+     */
+    @Override
+    public Result<List<DishDto>> listWithInsert(Dish dish) {
+        //条件构造器
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        //添加查询条件(菜品名称，菜品分类id，菜品起售状态，更新时间排序)
+        queryWrapper.like(Strings.isNotEmpty(dish.getName()), Dish::getName, dish.getName());
+        queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        queryWrapper.eq(Dish::getStatus, 1);
+        queryWrapper.orderByDesc(Dish::getUpdateTime);
+        //执行查询获取菜品列表
+        List<Dish> dishList = this.list(queryWrapper);
+
+        List<DishDto> dishDtos = dishList.stream().map(item -> {
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(item, dishDto);
+            Category category = categoryMapper.selectById(item.getCategoryId());
+            if (category != null) {
+                dishDto.setCategoryName(category.getName());
+            }
+            LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(DishFlavor::getDishId, item.getId());
+
+            dishDto.setFlavors(dishFlavorService.list(wrapper));
+            return dishDto;
+        }).collect(Collectors.toList());
+
+        return Result.success(dishDtos);
+    }
+
+    /**
+     * 修改菜品起售状态
+     * @param current 当前起售状态
+     * @param ids 选中菜品id
+     * @return 修改结果
+     */
+    @Override
+    public Result<String> changeStatus(Long current, List<Long> ids) {
+        //获取需要修改状态的套餐列表
+        List<Dish> dishList = this.listByIds(ids);
+        //遍历修改状态
+        dishList.forEach(item -> item.setStatus(item.getStatus() == 1 ? 0 : 1));
+        return this.updateBatchById(dishList) ? Result.success("修改状态成功") : null;
+    }
+
     /**
      * 修改菜品信息
+     *
      * @param dishDto 新增的菜品信息
      * @return 修改结果
      */
@@ -145,6 +198,26 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         flavors.forEach(item -> item.setDishId(dishDto.getId()));
         //更新口味表
         return dishFlavorService.saveBatch(flavors) ? Result.success("修改成功") : null;
+    }
+
+    /**
+     * 删除菜品
+     * @param ids 菜品id
+     * @return 删除结果
+     */
+    @Override
+    @Transactional
+    public Result<String> deleteDish(List<Long> ids) {
+        //查询套餐状态，确定是否可用删除
+        LambdaQueryWrapper<Dish> dishWrapper = new LambdaQueryWrapper<>();
+        dishWrapper.in(Dish::getId, ids);
+        dishWrapper.eq(Dish::getStatus, 1);
+        if (this.count(dishWrapper) > 0) {
+            //不能删除，抛出一个业务异常
+            throw new CustomException("菜品正在售卖中，无法删除");
+        }
+        //可以删除，直接删除
+        return this.removeByIds(ids) ? Result.success("删除菜品成功") : null;
     }
 
 }
