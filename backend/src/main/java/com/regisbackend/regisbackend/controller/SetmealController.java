@@ -5,6 +5,7 @@ import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.dto.SetmealDto;
 import com.regisbackend.regisbackend.service.SetmealService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,6 +54,29 @@ public class SetmealController {
     @GetMapping("/page")
     public Result<Page<SetmealDto>> page(int page, int pageSize, String name) {
         return setmealService.pageWithSetmeal(page, pageSize, name);
+    }
+
+    /**
+     * 根据id查询套餐信息
+     *
+     * @param id 套餐id
+     * @return 查询结果
+     */
+    @GetMapping("/{id}")
+    public Result<SetmealDto> getById(@PathVariable Long id) {
+        return setmealService.getByIdWithDish(id);
+    }
+
+
+    /**
+     * 修改套餐
+     * @param setmealDto 新增套餐信息
+     * @return 修改结果
+     */
+    @PutMapping
+    @Transactional
+    public Result<String> update(@RequestBody SetmealDto setmealDto) {
+        return setmealService.updateWithDish(setmealDto);
     }
 
     /**

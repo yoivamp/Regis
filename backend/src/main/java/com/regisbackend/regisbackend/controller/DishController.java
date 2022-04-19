@@ -60,6 +60,7 @@ public class DishController {
 
     /**
      * 查询所有可用菜品
+     *
      * @param dish 菜品
      * @return 查询结果
      */
@@ -68,6 +69,16 @@ public class DishController {
         return dishService.listWithInsert(dish);
     }
 
+    /**
+     * 修改菜品起售状态
+     * @param current 当前起售状态
+     * @param ids 选中菜品id
+     * @return 修改结果
+     */
+    @PostMapping("/status/{current}")
+    public Result<String> changeStatus(@PathVariable Long current, @RequestParam List<Long> ids) {
+        return dishService.changeStatus(current, ids);
+    }
 
     /**
      * 修改菜品信息
@@ -80,5 +91,14 @@ public class DishController {
         return dishService.updateWithFlavor(dishDto);
     }
 
+    /**
+     * 删除菜品
+     * @param ids 菜品id
+     * @return 删除结果
+     */
+    @DeleteMapping
+    public Result<String> delete(@RequestParam List<Long> ids) {
+        return dishService.deleteDish(ids);
+    }
 }
 
