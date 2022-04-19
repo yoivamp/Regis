@@ -40,6 +40,22 @@ public interface SetmealService extends IService<Setmeal> {
     Result<Page<SetmealDto>> pageWithSetmeal(int page, int pageSize, String name);
 
     /**
+     * 根据id查询套餐信息
+     *
+     * @param id 套餐id
+     * @return 查询结果
+     */
+    Result<SetmealDto> getByIdWithDish(Long id);
+
+    /**
+     * 修改套餐
+     *
+     * @param setmealDto 新增套餐信息
+     * @return 修改结果
+     */
+    Result<String> updateWithDish(SetmealDto setmealDto);
+
+    /**
      * 根据套餐id删除套餐
      *
      * @param ids 选中套餐id

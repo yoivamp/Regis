@@ -34,6 +34,7 @@ public interface DishService extends IService<Dish> {
 
     /**
      * 根据id回显菜品信息
+     *
      * @param id 菜品id
      * @return 回显信息
      */
@@ -42,15 +43,34 @@ public interface DishService extends IService<Dish> {
 
     /**
      * 查询所有可用菜品
+     *
      * @param dish 菜品
      * @return 查询结果
      */
     Result<List<DishDto>> listWithInsert(Dish dish);
 
     /**
+     * 修改菜品起售状态
+     *
+     * @param current 当前起售状态
+     * @param ids     选中菜品id
+     * @return 修改结果
+     */
+    Result<String> changeStatus(Long current, List<Long> ids);
+
+    /**
      * 修改菜品信息
+     *
      * @param dishDto 新增的菜品信息
      * @return 修改结果
      */
     Result<String> updateWithFlavor(DishDto dishDto);
+
+    /**
+     * 删除菜品
+     *
+     * @param ids 菜品id
+     * @return 删除结果
+     */
+    Result<String> deleteDish(List<Long> ids);
 }
