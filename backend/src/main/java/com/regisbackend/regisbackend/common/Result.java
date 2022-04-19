@@ -35,7 +35,7 @@ public class Result<T> {
         return result;
     }
 
-    public static <T> Result error(String message) {
+    public static <T> Result<T> error(String message) {
         Result<T> result = new Result<>();
         result.code=199;
         result.message=message;
