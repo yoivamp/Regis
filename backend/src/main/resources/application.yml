@@ -11,6 +11,11 @@ spring:
       password: root
 
 
+#文件位置
+regis:
+  path: D:\pause\regis-img\
+
+
 #MP配置
 mybatis-plus:
   configuration:

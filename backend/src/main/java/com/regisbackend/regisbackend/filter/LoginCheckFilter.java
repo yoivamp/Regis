@@ -1,6 +1,7 @@
 package com.regisbackend.regisbackend.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.regisbackend.regisbackend.common.MyBaseContext;
 import com.regisbackend.regisbackend.common.PathLocation;
 import com.regisbackend.regisbackend.common.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +14,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
-<<<<<<< HEAD
-=======
- * 静态资源过滤器
->>>>>>> hotfix-status
+ * 请求过滤器
+ *
  * @author 喵vamp
  */
 @WebFilter(filterName = "loginCheckFilter", urlPatterns = "/*")
@@ -41,10 +40,15 @@ public class LoginCheckFilter implements Filter {
         //3、判断登录状态，如果已登录，则直接放行
         if (request.getSession().getAttribute("employee") != null) {
             log.info("用户已登录，用户id为：{}", request.getSession().getAttribute("employee"));
+
+            //设置当前线程操作员工id
+            MyBaseContext.setCurrentId((Long) request.getSession().getAttribute("employee"));
+
             filterChain.doFilter(request, response);
             return;
         }
         //4、如果未登录则返回未登录结果，通过输出流方式向客户端页面响应数据
+        log.info("用户未登录");
         response.getWriter().write(JSON.toJSONString(Result.error("NOTLOGIN")));
         return;
     }

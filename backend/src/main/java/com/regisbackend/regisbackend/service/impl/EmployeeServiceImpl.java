@@ -11,11 +11,10 @@ import com.regisbackend.regisbackend.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
 /**
  * @author 喵vamp
@@ -32,7 +31,8 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
      * @param employee 员工信息
      * @return Result<Employee>
      */
-    public Result<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
+    @Override
+    public Result<Employee> login(HttpServletRequest request, Employee employee) {
         //1、将页面提交的密码password进行md5加密处理
         String password = employee.getPassword();
         password = DigestUtils.md5DigestAsHex(password.getBytes());
@@ -61,14 +61,14 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     /**
      * 新增员工
      *
-     * @param request  获取创建者和更新者id
      * @param employee 新员工信息
      * @return 添加操作结果
      */
-    public Result<String> save(HttpServletRequest request, @RequestBody Employee employee) {
+    @Override
+    public Result<String> saveEmployee(Employee employee) {
         log.info("新增员工信息：{}", employee.toString());
         //员工信息初始化
-        EmployeeInit.init(request, employee);
+        EmployeeInit.init(employee);
         //新增员工
         return save(employee) ? Result.success("添加员工成功") : null;
     }
@@ -81,6 +81,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
      * @param name     查询员工姓名
      * @return 员工信息
      */
+    @Override
     public Result<Page<Employee>> getPage(int page, int pageSize, String name) {
         log.info("page={},pageSize={},name={}", page, pageSize, name);
         //构造分页构造器
@@ -96,6 +97,13 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         return Result.success(pages);
     }
 
+    /**
+     * 根据员工id查询员工信息
+     *
+     * @param id 员工id
+     * @return 员工信息
+     */
+    @Override
     public Result<Employee> getEmployeeId(Long id) {
         log.info("根据id查询员工信息");
         //获取员工id
@@ -103,21 +111,16 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         return employee != null ? Result.success(employee) : Result.error("没有查询到对应的员工信息");
     }
 
-
     /**
      * 更新员工信息
      *
-     * @param request  获取更新时间和id
      * @param employee 更新的员工信息
      * @return 更新结果
      */
-    public Result<String> updateEmployee(HttpServletRequest request, @RequestBody Employee employee) {
+    @Override
+    @Transactional
+    public Result<String> updateEmployee(Employee employee) {
         log.info(employee.toString());
-        //获取修改员工id
-        Long emdId = (Long) request.getSession().getAttribute("employee");
-        //设置更新时间和更新者
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(emdId);
         return updateById(employee) ? Result.success("员工信息修改成功") : null;
     }
 }
