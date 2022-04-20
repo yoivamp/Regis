@@ -10,6 +10,7 @@ import com.regisbackend.regisbackend.pojo.AddressBook;
 import com.regisbackend.regisbackend.service.AddressBookService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -54,8 +55,14 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
         return this.updateById(addressBook) ? Result.success(addressBook) : null;
     }
 
+    @Override
+    public Result<AddressBook> updateAddressBook(AddressBook addressBook) {
+        return this.updateById(addressBook) ? Result.success(addressBook) : null;
+    }
+
     /**
      * 查询默认地址
+     *
      * @return 默认地址
      */
     @Override
@@ -87,5 +94,17 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
 
         //SQL:select * from address_book where user_id = ? order by update_time desc
         return Result.success(this.list(queryWrapper));
+    }
+
+    /**
+     * 删除地址
+     *
+     * @param ids 地址信息id
+     * @return 删除结果
+     */
+    @Override
+    @Transactional
+    public Result<String> deleteAddressBook(Long ids) {
+        return this.removeById(ids) ? Result.success("删除地址成功") : null;
     }
 }

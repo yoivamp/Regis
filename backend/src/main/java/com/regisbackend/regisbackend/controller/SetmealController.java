@@ -3,6 +3,7 @@ package com.regisbackend.regisbackend.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.dto.SetmealDto;
+import com.regisbackend.regisbackend.pojo.Setmeal;
 import com.regisbackend.regisbackend.service.SetmealService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,8 +69,14 @@ public class SetmealController {
     }
 
 
+    @GetMapping("/list")
+    public Result<List<Setmeal>> getCategoryId(Setmeal setmeal) {
+        return setmealService.getByCategoryId(setmeal);
+    }
+
     /**
      * 修改套餐
+     *
      * @param setmealDto 新增套餐信息
      * @return 修改结果
      */

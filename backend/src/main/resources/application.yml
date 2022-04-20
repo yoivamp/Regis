@@ -9,7 +9,11 @@ spring:
       url: jdbc:mysql://localhost:3306/regis?serverTimezone=UTC
       username: root
       password: root
-
+  #避免delete请求405错误
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
 
 #文件位置
 regis:
