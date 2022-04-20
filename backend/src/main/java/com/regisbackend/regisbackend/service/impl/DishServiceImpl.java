@@ -135,31 +135,33 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     /**
      * 查询所有可用菜品
      *
-     * @param dish 菜品
+     * @param dish 菜品(分类id)
      * @return 查询结果
      */
     @Override
     public Result<List<DishDto>> listWithInsert(Dish dish) {
         //条件构造器
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        //添加查询条件(菜品名称，菜品分类id，菜品起售状态，更新时间排序)
-        queryWrapper.like(Strings.isNotEmpty(dish.getName()), Dish::getName, dish.getName());
+        //添加查询条件(菜品分类id，菜品起售状态，更新时间排序)
         queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
         queryWrapper.eq(Dish::getStatus, 1);
-        queryWrapper.orderByDesc(Dish::getUpdateTime);
+        queryWrapper.orderByDesc(Dish::getUpdateTime).orderByAsc(Dish::getSort);
         //执行查询获取菜品列表
         List<Dish> dishList = this.list(queryWrapper);
 
+
         List<DishDto> dishDtos = dishList.stream().map(item -> {
             DishDto dishDto = new DishDto();
+            //设置dishDto的dish列表
             BeanUtils.copyProperties(item, dishDto);
+            //设置dishDto的分类名称
             Category category = categoryMapper.selectById(item.getCategoryId());
             if (category != null) {
                 dishDto.setCategoryName(category.getName());
             }
+            //设置dishDto的口味列表
             LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(DishFlavor::getDishId, item.getId());
-
             dishDto.setFlavors(dishFlavorService.list(wrapper));
             return dishDto;
         }).collect(Collectors.toList());
@@ -169,8 +171,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     /**
      * 修改菜品起售状态
+     *
      * @param current 当前起售状态
-     * @param ids 选中菜品id
+     * @param ids     选中菜品id
      * @return 修改结果
      */
     @Override
@@ -207,6 +210,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     /**
      * 删除菜品
+     *
      * @param ids 菜品id
      * @return 删除结果
      */
@@ -223,9 +227,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }
 
         //查询setmeal_dish是否含有该菜品，如果有则不能删除
-        LambdaQueryWrapper<SetmealDish> setmealDishWrapper=new LambdaQueryWrapper<>();
-        setmealDishWrapper.in(SetmealDish::getDishId,ids);
-        if(setmealDishService.count(setmealDishWrapper)>0){
+        LambdaQueryWrapper<SetmealDish> setmealDishWrapper = new LambdaQueryWrapper<>();
+        setmealDishWrapper.in(SetmealDish::getDishId, ids);
+        if (setmealDishService.count(setmealDishWrapper) > 0) {
             //有套餐包含该菜品，不能删除，抛出一个业务异常
             throw new CustomException("该菜品正在售卖的套餐中，无法删除");
         }

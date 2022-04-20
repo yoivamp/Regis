@@ -47,6 +47,8 @@ public interface SetmealService extends IService<Setmeal> {
      */
     Result<SetmealDto> getByIdWithDish(Long id);
 
+    Result<List<Setmeal>> getByCategoryId(Setmeal setmeal);
+
     /**
      * 修改套餐
      *

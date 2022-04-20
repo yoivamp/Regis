@@ -27,6 +27,8 @@ public interface AddressBookService extends IService<AddressBook> {
      */
     Result<AddressBook> setDefault(AddressBook addressBook);
 
+    Result<AddressBook> updateAddressBook(AddressBook addressBook);
+
     /**
      * 查询默认地址
      * @return 默认地址
@@ -41,4 +43,11 @@ public interface AddressBookService extends IService<AddressBook> {
      */
     Result<List<AddressBook>> listAddressBook(AddressBook addressBook);
 
+    /**
+     * 删除地址
+     *
+     * @param ids 地址信息id
+     * @return 删除结果
+     */
+    Result<String> deleteAddressBook(Long ids);
 }
