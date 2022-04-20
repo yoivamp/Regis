@@ -120,6 +120,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
     /**
      * 根据id查询套餐信息
+     *
      * @param id 套餐id
      * @return 查询结果
      */
@@ -149,28 +150,39 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         return Result.success(setmealDto);
     }
 
+    @Override
+    public Result<List<Setmeal>> getByCategoryId(Setmeal setmeal) {
+        //设置查询条件(分类id，起售状态)
+        LambdaQueryWrapper<Setmeal> setmealWrapper = new LambdaQueryWrapper<>();
+        setmealWrapper.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId());
+        setmealWrapper.eq(setmeal.getStatus() != null, Setmeal::getStatus, setmeal.getStatus());
+        setmealWrapper.orderByDesc(Setmeal::getUpdateTime);
+        return Result.success(this.list(setmealWrapper));
+    }
+
     /**
      * 修改套餐
+     *
      * @param setmealDto 新增套餐信息
      * @return 修改结果
      */
     @Override
     public Result<String> updateWithDish(SetmealDto setmealDto) {
         //更新新增的菜品,更新setmeal_dish对应套餐id中的菜品
-            //清理当前套餐对应菜品数据---setmeal_dish表的delete操作
-                //创建查询setmeal_dish中对应套餐id所有的菜品
-        LambdaQueryWrapper<SetmealDish> setmealDishWrapper=new LambdaQueryWrapper<>();
-        setmealDishWrapper.eq(SetmealDish::getSetmealId,setmealDto.getId());
+        //清理当前套餐对应菜品数据---setmeal_dish表的delete操作
+        //创建查询setmeal_dish中对应套餐id所有的菜品
+        LambdaQueryWrapper<SetmealDish> setmealDishWrapper = new LambdaQueryWrapper<>();
+        setmealDishWrapper.eq(SetmealDish::getSetmealId, setmealDto.getId());
         setmealDishService.remove(setmealDishWrapper);
-            //添加当前提交过来的菜品数据---setmeal_dish表的insert操作
-        List<SetmealDish>setmealDishList = setmealDto.getSetmealDishes();
-                //添加菜品对应的套餐id
-        setmealDishList.forEach(item->item.setSetmealId(setmealDto.getId()));
+        //添加当前提交过来的菜品数据---setmeal_dish表的insert操作
+        List<SetmealDish> setmealDishList = setmealDto.getSetmealDishes();
+        //添加菜品对应的套餐id
+        setmealDishList.forEach(item -> item.setSetmealId(setmealDto.getId()));
         setmealDishService.saveBatch(setmealDishList);
         //更新套餐中的分类id
-            //从category表查询条件为套餐分类名称
-        LambdaQueryWrapper<Category> categoryWrapper=new LambdaQueryWrapper<>();
-        categoryWrapper.eq(Strings.isNotEmpty(setmealDto.getCategoryName()),Category::getName,setmealDto.getCategoryName());
+        //从category表查询条件为套餐分类名称
+        LambdaQueryWrapper<Category> categoryWrapper = new LambdaQueryWrapper<>();
+        categoryWrapper.eq(Strings.isNotEmpty(setmealDto.getCategoryName()), Category::getName, setmealDto.getCategoryName());
         Category category = categoryMapper.selectOne(categoryWrapper);
         setmealDto.setCategoryName(category.getName());
         //更新setmeal表基本信息

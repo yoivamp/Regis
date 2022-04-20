@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
@@ -47,4 +48,17 @@ public class UserController {
         return userService.login(map, session);
     }
 
+
+    /**
+     * 退出登录
+     *
+     * @param request 删除存储用户id
+     * @return 退出登录
+     */
+    @PostMapping("/loginout")
+    public Result<String> loginout(HttpServletRequest request) {
+        //清理Session中保存的当前登录用户的id
+        request.getSession().removeAttribute("user");
+        return Result.success("退出成功");
+    }
 }

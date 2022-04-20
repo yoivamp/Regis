@@ -44,11 +44,17 @@ public class AddressBookController {
         return addressBookService.setDefault(addressBook);
     }
 
+    @PutMapping
+    public Result<AddressBook> update(@RequestBody AddressBook addressBook) {
+        return addressBookService.updateAddressBook(addressBook);
+    }
+
+
     /**
      * 根据id查询地址
      */
     @GetMapping("/{id}")
-    public Result<AddressBook> get(@PathVariable Long id) {
+    public Result<AddressBook> get(@PathVariable("id") Long id) {
         AddressBook addressBook = addressBookService.getById(id);
         if (addressBook != null) {
             return Result.success(addressBook);
@@ -76,5 +82,16 @@ public class AddressBookController {
     @GetMapping("/list")
     public Result<List<AddressBook>> list(AddressBook addressBook) {
         return addressBookService.listAddressBook(addressBook);
+    }
+
+    /**
+     * 删除地址
+     *
+     * @param ids 地址信息id
+     * @return 删除结果
+     */
+    @DeleteMapping
+    public Result<String> delete(Long ids) {
+        return addressBookService.deleteAddressBook(ids);
     }
 }
