@@ -8,9 +8,11 @@ import com.regisbackend.regisbackend.common.CustomException;
 import com.regisbackend.regisbackend.common.MyBaseContext;
 import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.dao.OrderMapper;
+import com.regisbackend.regisbackend.dto.OrdersDto;
 import com.regisbackend.regisbackend.pojo.*;
 import com.regisbackend.regisbackend.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -113,22 +115,42 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
         return shoppingCartService.remove(shoppingCartWrapper) ? Result.success("下单成功") : null;
     }
 
+    /**
+     * 分页查询订单
+     * @param page 当前页码
+     * @param pageSize 每页条目数
+     * @return 查询page
+     */
     @Override
-    public Result<Page<OrderDetail>> pageOrderDetail(int page, int pageSize) {
+    public Result<Page<OrdersDto>> pageOrderDetail(int page, int pageSize) {
+        //准备三张表的page
+        Page<OrdersDto> ordersDtoPage = new Page<>();
         Page<OrderDetail> orderDetailPage = new Page<>(page, pageSize);
+        Page<Orders> ordersPage = new Page<>(page, pageSize);
+
+        //查询order表，并赋值给orderDto的page
         LambdaQueryWrapper<Orders> ordersWrapper = new LambdaQueryWrapper<>();
         ordersWrapper.eq(Orders::getUserId, MyBaseContext.getCurrentId());
-        List<Orders> list = this.list(ordersWrapper);
-        //查询订单的订单明细页
-        list.forEach(item->{
+        this.page(ordersPage, ordersWrapper);
+        BeanUtils.copyProperties(ordersPage, ordersDtoPage);
+
+        //查询orderDetai表，并遍历给orderDto设置
+        List<Orders> ordersRecords = ordersPage.getRecords();
+        List<OrdersDto> ordersDtoList = ordersRecords.stream().map(item -> {
+            OrdersDto ordersDto = new OrdersDto();
+            BeanUtils.copyProperties(item, ordersDto);
+
+            //根据遍历的order表的id查询orderDetail表
             LambdaQueryWrapper<OrderDetail> detaiWrapper = new LambdaQueryWrapper<>();
             detaiWrapper.eq(OrderDetail::getOrderId, item.getId());
             orderDetailService.page(orderDetailPage, detaiWrapper);
-        });
-        log.info("detail------->");
-        orderDetailPage.getRecords().forEach(System.out::println);
-        return Result.success(orderDetailPage);
+            List<OrderDetail> detailRecords = orderDetailPage.getRecords();
+            //设置ordersDto的orderDetail列表
+            ordersDto.setOrderDetails(detailRecords);
+            return ordersDto;
+        }).collect(Collectors.toList());
+        //设置ordersDto的page的records
+        ordersDtoPage.setRecords(ordersDtoList);
+        return Result.success(ordersDtoPage);
     }
-
-
 }
