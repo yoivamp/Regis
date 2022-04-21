@@ -175,25 +175,25 @@
         >
           <div>
             <el-form-item label="套餐名称:" prop="name" >
-              <el-input v-model="ruleForm.name" placeholder="请填写套餐名称" maxlength="20"/>
+              <el-input v-model="ruleForm.name" placeholder="请填写套餐名称" maxlength="20"></el-input>
             </el-form-item>
             <el-form-item label="套餐分类:" prop="idType">
               <el-select v-model="ruleForm.idType" placeholder="请选择套餐分类" @change="$forceUpdate()">
-                <el-option v-for="(item, index) in setMealList" :key="index" :label="item.name" :value="item.id" />
+                <el-option v-for="(item, index) in setMealList" :key="index" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </el-form-item>
           </div>
           <div>
             <el-form-item label="套餐价格:" prop="price">
-              <el-input v-model="ruleForm.price" placeholder="请设置套餐价格" />
+              <el-input v-model="ruleForm.price" placeholder="请设置套餐价格"></el-input>
             </el-form-item>
           </div>
           <div>
             <el-form-item label="套餐菜品:" class="setmealFood">
               <el-form-item>
                 <div class="addDish">
-                  <span v-if="dishTable.length == 0" class="addBut" @click="openAddDish"> + 添加菜品</span>
-                  <div v-if="dishTable.length != 0" class="content">
+                  <span v-if="dishTable.length === 0" class="addBut" @click="openAddDish"> + 添加菜品</span>
+                  <div v-if="dishTable.length !== 0" class="content">
                     <div class="addBut" style="margin-bottom: 20px" @click="openAddDish">+ 添加菜品</div>
                     <div class="table">
                       <el-table :data="dishTable" style="width: 100%">
@@ -234,14 +234,14 @@
                 :on-change="onChange"
                 ref="upload"
               >
-                <img v-if="imageUrl" :src="imageUrl" class="avatar"></img>
+                <img v-if="imageUrl" :src="imageUrl" class="avatar" alt=""/>
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               </el-upload>
             </el-form-item>
           </div>
           <div class="address">
             <el-form-item label="套餐描述:">
-              <el-input v-model="ruleForm.description" type="textarea" :rows="3" placeholder="套餐描述，最长200字" maxlength="200"/>
+              <el-input v-model="ruleForm.description" type="textarea" :rows="3" placeholder="套餐描述，最长200字" maxlength="200"></el-input>
             </el-form-item>
           </div>
           <div class="subBox address">
@@ -249,7 +249,7 @@
               <el-button @click="goBack()"> 取消 </el-button>
               <el-button type="primary" @click="submitForm('ruleForm', false)"> 保存 </el-button>
               <el-button
-                v-if="actionType == 'add'"
+                v-if="actionType === 'add'"
                 type="primary"
                 class="continue"
                 @click="submitForm('ruleForm', true)"
@@ -282,19 +282,19 @@
         <div class="addDishCon">
           <div class="leftCont">
             <div
-              v-show="seachKey.trim() == ''"
+              v-show="seachKey.trim() === ''"
               class="tabBut"
             >
               <span
                 v-for="(item, index) in dishType"
                 :key="index"
-                :class="{act:index == keyInd}"
+                :class="{act:index === keyInd}"
                 @click="checkTypeHandle(index, item.id)"
               >{{ item.name }}</span>
             </div>
             <div class="tabList">
               <div class="table">
-                <div v-if="dishAddList.length == 0" style="padding-left:10px">
+                <div v-if="dishAddList.length === 0" style="padding-left:10px">
                   暂无菜品!
                 </div>
                 <el-checkbox-group
@@ -313,7 +313,7 @@
                     >
                       <div class="item">
                         <span style="flex: 3;text-align: left">{{ item.dishName }}</span>
-                        <span>{{ item.status == 0 ? '停售' : '在售' }}</span>
+                        <span>{{ item.status === 0 ? '停售' : '在售' }}</span>
                         <span>{{ Number(item.price)/100 }}</span>
                       </div>
                     </el-checkbox>
@@ -460,7 +460,7 @@
         methods: {
           async init() {
             querySetmealById(this.id).then((res) => {
-              if (String(res.code) === '1') {
+              if (res.code === 200) {
                 this.ruleForm = res.data
                 this.ruleForm.status = res.data.status === '1'
                 this.ruleForm.price = res.data.price / 100
@@ -470,7 +470,7 @@
                 this.ruleForm.idType = res.data.categoryId
                 // this.ruleForm.password = ''
               } else {
-                this.$message.error(res.msg || '操作失败')
+                this.$message.error(res.message || '操作失败')
               }
             })
           },
@@ -480,10 +480,10 @@
           // 获取套餐分类
           getDishTypeList() {
             getCategoryList({ type: 2, page: 1, pageSize: 1000 }).then((res) => {
-              if (res.code === 1) {
+              if (res.code === 200) {
                 this.setMealList = res.data.map((obj) => ({ ...obj, idType: obj.id }))
               } else {
-                this.$message.error(res.msg || '操作失败')
+                this.$message.error(res.message || '操作失败')
               }
             })
           },
@@ -547,11 +547,11 @@
                   return 
                 }
                 // delete prams.dishList
-                if (this.actionType == 'add') {
+                if (this.actionType === 'add') {
                   delete prams.id
                   addSetmeal(prams)
                     .then((res) => {
-                      if (res.code === 1) {
+                      if (res.code === 200) {
                         this.$message.success('套餐添加成功！')
                         if (!st) {
                           this.goBack()
@@ -584,11 +584,11 @@
                   delete prams.updateTime
                   editSetmeal(prams)
                     .then((res) => {
-                      if (res.code === 1) {
+                      if (res.code === 200) {
                         this.$message.success('套餐修改成功！')
                         this.goBack()
                       } else {
-                        this.$message.error(res.msg || '操作失败')
+                        this.$message.error(res.message || '操作失败')
                       }
                     })
                     .catch((err) => {
@@ -602,7 +602,7 @@
           },
           handleAvatarSuccess (response, file, fileList) {
             // this.imageUrl = response.data
-            if(response.code === 0 && response.msg === '未登录'){
+            if(response.code === 199 && response.message === '未登录'){
               window.top.location.href = '/backend/page/login/login.html'
             }else{
               this.imageUrl = `/common/download?name=${response.data}`
@@ -639,11 +639,11 @@
           // 获取套餐分类
           getDishType () {
             getCategoryList({'type':1}).then(res => {
-              if (res.code === 1) {
+              if (res.code === 200) {
                 this.dishType = res.data
                 this.getDishList(res.data[0].id)
               } else {
-                this.$message.error(res.msg)
+                this.$message.error(res.message)
               }
             })
           },
@@ -651,8 +651,8 @@
           // 通过套餐ID获取菜品列表分类
           getDishList (id) {
             queryDishList({categoryId: id}).then(res => {
-              if (res.code === 1) {
-                if (res.data.length == 0) {
+              if (res.code === 200) {
+                if (res.data.length === 0) {
                   this.dishAddList = []
                   return
                 }
@@ -665,7 +665,7 @@
                 })
                 this.dishAddList = newArr
               } else {
-                this.$message.error(res.msg)
+                this.$message.error(res.message)
               }
             })
           },
@@ -673,7 +673,7 @@
           // 关键词收搜菜品列表分类
           getDishForName (name) {
             queryDishList({name}).then(res => {
-              if (res.code === 1) {
+              if (res.code === 200) {
                 let newArr = res.data
                 newArr.forEach((n) => {
                   n.dishId = n.id
@@ -681,7 +681,7 @@
                 })
                 this.dishAddList = newArr
               } else {
-                this.$message.error(res.msg)
+                this.$message.error(res.message)
               }
             })
           },
