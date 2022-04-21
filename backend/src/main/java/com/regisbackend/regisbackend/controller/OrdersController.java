@@ -2,13 +2,11 @@ package com.regisbackend.regisbackend.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.regisbackend.regisbackend.common.Result;
-import com.regisbackend.regisbackend.pojo.OrderDetail;
+import com.regisbackend.regisbackend.dto.OrdersDto;
 import com.regisbackend.regisbackend.pojo.Orders;
 import com.regisbackend.regisbackend.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @author 喵vamp
@@ -30,8 +28,14 @@ public class OrdersController {
         return ordersService.submitOrders(orders);
     }
 
+    /**
+     * 分页查询订单
+     * @param page 当前页码
+     * @param pageSize 每页条目数
+     * @return 查询page
+     */
     @GetMapping("/userPage")
-    public Result<Page<OrderDetail>> page(int page, int pageSize){
+    public Result<Page<OrdersDto>> page(int page, int pageSize){
         return ordersService.pageOrderDetail(page,pageSize);
     }
 }
