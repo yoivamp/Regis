@@ -19,10 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +42,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 新增菜品
@@ -62,6 +67,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
                 }).collect(Collectors.toList());
         //保存菜品口味数据到菜品口味表dish_flavor
         dishFlavorService.saveBatch(listFlavor);
+
+        //清理某个分类下面的菜品缓存数据
+        String key = "dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus();
+        redisTemplate.delete(key);
         return Result.success("添加菜品成功");
     }
 
@@ -140,6 +149,18 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      */
     @Override
     public Result<List<DishDto>> listWithInsert(Dish dish) {
+        List<DishDto> dishDtoList;
+
+        //动态构造key
+        String key = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
+        //先从redis中获取缓存数据
+        dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
+
+        //如果存在缓存，直接返回缓存数据
+        if (dishDtoList != null) {
+            return Result.success(dishDtoList);
+        }
+
         //条件构造器
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         //添加查询条件(菜品分类id，菜品起售状态，更新时间排序)
@@ -150,7 +171,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         List<Dish> dishList = this.list(queryWrapper);
 
 
-        List<DishDto> dishDtos = dishList.stream().map(item -> {
+        dishDtoList = dishList.stream().map(item -> {
             DishDto dishDto = new DishDto();
             //设置dishDto的dish列表
             BeanUtils.copyProperties(item, dishDto);
@@ -166,7 +187,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             return dishDto;
         }).collect(Collectors.toList());
 
-        return Result.success(dishDtos);
+        //如果不存在，需要查询数据库，将查询到的菜品数据缓存到Redis
+        redisTemplate.opsForValue().set(key, dishDtoList, 60, TimeUnit.MINUTES);
+        return Result.success(dishDtoList);
     }
 
     /**
@@ -182,6 +205,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         List<Dish> dishList = this.listByIds(ids);
         //遍历修改状态
         dishList.forEach(item -> item.setStatus(item.getStatus() == 1 ? 0 : 1));
+
+        //清理某个分类下面的菜品缓存数据
+        String key = "dish_" + this.getById(ids.get(0)).getCategoryId() + "_1";
+        redisTemplate.delete(key);
         return this.updateBatchById(dishList) ? Result.success("修改状态成功") : null;
     }
 
@@ -204,6 +231,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         List<DishFlavor> flavors = dishDto.getFlavors();
         //为新增的口味数据添加对应的菜品id
         flavors.forEach(item -> item.setDishId(dishDto.getId()));
+
+        //清理某个分类下面的菜品缓存数据
+        String key = "dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus();
+        redisTemplate.delete(key);
         //更新口味表
         return dishFlavorService.saveBatch(flavors) ? Result.success("修改成功") : null;
     }
@@ -235,7 +266,11 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }
 
         //可以删除，直接删除
-        return this.removeByIds(ids) ? Result.success("删除菜品成功") : null;
+        //清理某个分类下面的菜品缓存数据
+        String key = "dish_" + this.getById(ids.get(0)).getCategoryId() + "1";
+        redisTemplate.delete(key);
+        this.removeByIds(ids);
+        return Result.success("删除菜品成功");
     }
 
 }
