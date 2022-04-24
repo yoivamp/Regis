@@ -2,6 +2,7 @@ package com.regisbackend.regisbackend.common;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ import java.util.Map;
  * @author 喵vamp
  */
 @Data
-public class Result<T> {
+public class Result<T> implements Serializable {
     /**
      * 响应状态码
      */
