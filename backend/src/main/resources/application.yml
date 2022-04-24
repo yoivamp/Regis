@@ -9,13 +9,16 @@ spring:
       url: jdbc:mysql://localhost:3306/regis?serverTimezone=UTC
       username: root
       password: root
-
+  #redis配置
   redis:
       host: 127.0.0.1
       port: 6379
 #      password: root@123456
       database: 0
-
+  #缓存配置
+  cache:
+    redis:
+      time-to-live: 1800000
 
 
 

@@ -7,6 +7,8 @@ import com.regisbackend.regisbackend.pojo.Dish;
 import com.regisbackend.regisbackend.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +32,7 @@ public class DishController {
      * @return 添加结果
      */
     @PostMapping
+    @CacheEvict(value = "dishCache",allEntries = true)
     public Result<String> save(@RequestBody DishDto dishDto) {
         return dishService.saveWithFlavor(dishDto);
     }
@@ -65,6 +68,7 @@ public class DishController {
      * @return 查询结果
      */
     @GetMapping("/list")
+    @Cacheable(value = "dishCache",key = "#dish.categoryId+'_'+#dish.status")
     public Result<List<DishDto>> list(Dish dish) {
         return dishService.listWithInsert(dish);
     }
@@ -75,6 +79,7 @@ public class DishController {
      * @param ids 选中菜品id
      * @return 修改结果
      */
+    @CacheEvict(value = "dishCache",allEntries = true)
     @PostMapping("/status/{current}")
     public Result<String> changeStatus(@PathVariable Long current, @RequestParam List<Long> ids) {
         return dishService.changeStatus(current, ids);
@@ -87,6 +92,7 @@ public class DishController {
      * @return 修改结果
      */
     @PutMapping
+    @CacheEvict(value = "dishCache",allEntries = true)
     public Result<String> update(@RequestBody DishDto dishDto) {
         return dishService.updateWithFlavor(dishDto);
     }
@@ -97,6 +103,7 @@ public class DishController {
      * @return 删除结果
      */
     @DeleteMapping
+    @CacheEvict(value = "dishCache",allEntries = true)
     public Result<String> delete(@RequestParam List<Long> ids) {
         return dishService.deleteDish(ids);
     }

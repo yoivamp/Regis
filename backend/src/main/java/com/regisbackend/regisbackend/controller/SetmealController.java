@@ -6,6 +6,8 @@ import com.regisbackend.regisbackend.dto.SetmealDto;
 import com.regisbackend.regisbackend.pojo.Setmeal;
 import com.regisbackend.regisbackend.service.SetmealService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +30,7 @@ public class SetmealController {
      * @return 添加结果
      */
     @PostMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public Result<String> save(@RequestBody SetmealDto setmealDto) {
         return setmealService.saveWithDish(setmealDto);
     }
@@ -39,6 +42,7 @@ public class SetmealController {
      * @param ids     选中套餐id
      * @return 修改结果
      */
+    @CacheEvict(value = "setmealCache",allEntries = true)
     @PostMapping("/status/{current}")
     public Result<String> changeStatus(@PathVariable Long current, @RequestParam List<Long> ids) {
         return setmealService.changeStatus(current, ids);
@@ -70,6 +74,7 @@ public class SetmealController {
 
 
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId + '_' + #setmeal.status")
     public Result<List<Setmeal>> getCategoryId(Setmeal setmeal) {
         return setmealService.getByCategoryId(setmeal);
     }
@@ -82,6 +87,7 @@ public class SetmealController {
      */
     @PutMapping
     @Transactional
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public Result<String> update(@RequestBody SetmealDto setmealDto) {
         return setmealService.updateWithDish(setmealDto);
     }
@@ -93,6 +99,7 @@ public class SetmealController {
      * @return 删除结果
      */
     @DeleteMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public Result<String> delete(@RequestParam List<Long> ids) {
         return setmealService.deleteWithDish(ids);
     }
