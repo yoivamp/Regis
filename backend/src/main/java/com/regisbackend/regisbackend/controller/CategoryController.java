@@ -6,6 +6,8 @@ import com.regisbackend.regisbackend.pojo.Category;
 import com.regisbackend.regisbackend.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +31,7 @@ public class CategoryController {
      * @return 新增结果
      */
     @PostMapping
+    @CacheEvict(value = "categoryCache",allEntries = true)
     public Result<String> save(@RequestBody Category category) {
         return categoryService.saveCategory(category);
     }
@@ -51,6 +54,7 @@ public class CategoryController {
      * @return 分类列表
      */
     @GetMapping("/list")
+    @Cacheable(value = "categoryCache")
     public Result<List<Category>> getCategoryList(Category category) {
         return categoryService.getCategoryList(category);
     }
@@ -62,6 +66,7 @@ public class CategoryController {
      * @return 删除结果
      */
     @DeleteMapping
+    @CacheEvict(value = "categoryCache",allEntries = true)
     public Result<String> delete(Long id) {
         return categoryService.deleteCategory(id);
     }
@@ -73,6 +78,7 @@ public class CategoryController {
      * @return 修改结果
      */
     @PutMapping
+    @CacheEvict(value = "categoryCache",allEntries = true)
     public Result<String> update(@RequestBody Category category) {
         return categoryService.updateCategory(category);
     }
