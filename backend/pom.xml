@@ -88,7 +88,7 @@
             <version>1.2.6</version>
         </dependency>
 
-
+        <!--springboot集成redis-->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
@@ -111,9 +111,19 @@
             <artifactId>jedis</artifactId>
         </dependency>
 
+        <!--缓存注解-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+
+
+
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <version>3.0.2</version>
         </dependency>
 
     </dependencies>

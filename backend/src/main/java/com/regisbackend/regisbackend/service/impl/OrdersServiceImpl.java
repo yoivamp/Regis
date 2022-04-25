@@ -12,6 +12,7 @@ import com.regisbackend.regisbackend.dto.OrdersDto;
 import com.regisbackend.regisbackend.pojo.*;
 import com.regisbackend.regisbackend.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,8 +29,6 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implements OrdersService {
-
-
     @Autowired
     private ShoppingCartService shoppingCartService;
 
@@ -41,7 +40,6 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
 
     @Autowired
     private OrderDetailService orderDetailService;
-
 
     /**
      * 用户下单
@@ -98,7 +96,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
         orders.setAmount(new BigDecimal(amount.get()));
         orders.setUserId(userId);
         orders.setNumber(String.valueOf(orderId));
-        orders.setUserName(user.getName());
+        //  orders.setUserName(user.getName());
         orders.setConsignee(addressBook.getConsignee());
         orders.setPhone(addressBook.getPhone());
         orders.setAddress((addressBook.getProvinceName() == null ? "" : addressBook.getProvinceName())
@@ -116,8 +114,20 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
     }
 
     /**
+     * 再来一单
+     *
+     * @param orders 订单id
+     * @return 跳转首页
+     */
+    @Override
+    public Result<String> againOrder(Orders orders) {
+        return Result.success("跳转成功");
+    }
+
+    /**
      * 分页查询订单
-     * @param page 当前页码
+     *
+     * @param page     当前页码
      * @param pageSize 每页条目数
      * @return 查询page
      */
@@ -149,8 +159,52 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
             ordersDto.setOrderDetails(detailRecords);
             return ordersDto;
         }).collect(Collectors.toList());
+
         //设置ordersDto的page的records
         ordersDtoPage.setRecords(ordersDtoList);
         return Result.success(ordersDtoPage);
+    }
+
+    /**
+     * 后端管理订单的分页及条件查询
+     *
+     * @param page      当前页码
+     * @param pageSize  每页条目数
+     * @param number    订单号
+     * @param orderTime 下单时间
+     * @param endTime   截止时间
+     * @return 查询结果
+     */
+    @Override
+    public Result<Page<OrdersDto>> pageBackend(int page, int pageSize, String number, LocalDateTime orderTime, LocalDateTime endTime) {
+        Page<Orders> ordersPage = new Page<>(page, pageSize);
+        Page<OrdersDto> ordersDtoPage = new Page<>();
+
+        //查询order表，并赋值给orderDto的page
+        LambdaQueryWrapper<Orders> ordersWrapper = new LambdaQueryWrapper<>();
+        //查询订单号
+        ordersWrapper.eq(Strings.isNotEmpty(number), Orders::getNumber, number);
+        //查询下单时间在所给时间之间
+        ordersWrapper.between(orderTime != null && endTime != null, Orders::getOrderTime, orderTime, endTime);
+        //查询订单信息
+        this.page(ordersPage, ordersWrapper);
+
+        BeanUtils.copyProperties(ordersPage, ordersDtoPage);
+        return Result.success(ordersDtoPage);
+    }
+
+
+    /**
+     * 派送订单
+     *
+     * @param orders 订单id和状态
+     * @return 派送结果
+     */
+    @Override
+    public Result<String> sendOrder(Orders orders) {
+        if (orders.getStatus() < 5) {
+            orders.setStatus(orders.getStatus() + 1);
+        }
+        return this.updateById(orders) ? Result.success("已派送") : null;
     }
 }
