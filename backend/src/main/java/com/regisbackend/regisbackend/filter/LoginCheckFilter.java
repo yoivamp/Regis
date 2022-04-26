@@ -22,8 +22,6 @@ import java.util.List;
 @Slf4j
 public class LoginCheckFilter implements Filter {
 
-    private  boolean backendFlag;
-    private  boolean frontFlag;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -39,31 +37,13 @@ public class LoginCheckFilter implements Filter {
             filterChain.doFilter(request, response);
             return;
         }
-
-        //3-1、判断登录状态，如果已登录，则直接放行
-        if (request.getSession().getAttribute("employee") != null&&!backendFlag) {
-            log.info("用户已登录，用户id为：{}", request.getSession().getAttribute("employee"));
-
-            Long empId = (Long) request.getSession().getAttribute("employee");
-            MyBaseContext.setCurrentId(empId);
-
+        //3、判断登录状态，如果已登录，则直接放行
+        if (isLogin(request, "employee") || isLogin(request, "user")) {
             filterChain.doFilter(request, response);
-            return;
-        } else if (request.getSession().getAttribute("user") != null&&!frontFlag) {
-            //3-2、判断登录状态，如果已登录，则直接放行
-            log.info("用户已登录，用户id为：{}", request.getSession().getAttribute("user"));
-
-            Long userId = (Long) request.getSession().getAttribute("user");
-            MyBaseContext.setCurrentId(userId);
-
-            backendFlag=true;
-            filterChain.doFilter(request, response);
-            return;
         } else {
             //4、如果未登录则返回未登录结果，通过输出流方式向客户端页面响应数据
             log.info("用户未登录");
             response.getWriter().write(JSON.toJSONString(Result.error("NOTLOGIN")));
-            return;
         }
     }
 
@@ -72,6 +52,16 @@ public class LoginCheckFilter implements Filter {
             if (PathLocation.PATH_MATCHER.match(str, requestUri)) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public boolean isLogin(HttpServletRequest request, String string) {
+        if (request.getSession().getAttribute(string) != null) {
+            log.info("用户已登录，用户id为：{}", request.getSession().getAttribute(string));
+            Long id = (Long) request.getSession().getAttribute(string);
+            MyBaseContext.setCurrentId(id);
+            return true;
         }
         return false;
     }
