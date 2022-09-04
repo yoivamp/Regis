@@ -29,6 +29,8 @@ public class LoginCheckFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+
+
         //1、获取本次请求的URI
         String requestUri = request.getRequestURI();
         //2、判断本次请求是否需要处理,如果不需要处理，则直接放行

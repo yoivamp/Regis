@@ -1,20 +1,55 @@
 server:
-  port: 80
+  port: 8080
 
 #数据库配置
 spring:
-  datasource:
-    druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/regis?serverTimezone=UTC
-      username: root
-      password: root
+  #  datasource:
+  #    druid:
+  #      driver-class-name: com.mysql.cj.jdbc.Driver
+  #      url: jdbc:mysql://localhost:3306/regis?serverTimezone=UTC
+  #      username: root
+  #      password: root
+
+  shardingsphere:
+    datasource:
+      names:
+        master,slave
+      # 主数据源
+      master:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.119.132:3306/regis?characterEncoding=utf-8
+        username: mike
+        password: mike
+      # 从数据源
+      slave:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.119.133:3306/regis?characterEncoding=utf-8
+        username: mike
+        password: mike
+    masterslave:
+      # 读写分离配置
+      load-balance-algorithm-type: round_robin #轮询
+      # 最终的数据源名称
+      name: dataSource
+      # 主库数据源名称
+      master-data-source-name: master
+      # 从库数据源名称列表，多个逗号分隔
+      slave-data-source-names: slave
+    props:
+      sql:
+        show: true #开启SQL显示，默认false
+  main:
+    allow-bean-definition-overriding: true
+
+
   #redis配置
   redis:
-      host: 127.0.0.1
-      port: 6379
-#      password: root@123456
-      database: 0
+    host: 192.168.119.130
+    port: 6379
+    #      password: root@123456
+    database: 0
   #缓存配置
   cache:
     redis:
@@ -30,7 +65,8 @@ spring:
 
 #文件位置
 regis:
-  path: D:\pause\regis-img\
+  #  path: D:\pause\regis-img\
+  path: /usr/local/img/
 
 
 #MP配置
