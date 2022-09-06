@@ -55,4 +55,6 @@ public interface EmployeeService extends IService<Employee> {
      */
     @Transactional
     Result<String> updateEmployee(Employee employee);
+
+    Result<String> logout();
 }

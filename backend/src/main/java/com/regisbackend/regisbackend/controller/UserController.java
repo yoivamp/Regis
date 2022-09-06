@@ -10,12 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
  * @author 喵vamp
+ * @Description 移动端用户管理
  */
 @RestController
 @Slf4j
@@ -32,33 +31,29 @@ public class UserController {
      * @return 验证码
      */
     @PostMapping("/sendMsg")
-    public Result<String> sendMsg(@RequestBody User user, HttpSession session) {
-        return userService.sendMsg(user, session);
+    public Result<String> sendMsg(@RequestBody User user) {
+        return userService.sendMsg(user);
     }
 
     /**
      * 移动端用户登录
      *
-     * @param map     用户信息
-     * @param session 存储手机号
+     * @param map 用户信息
      * @return 登录结果
      */
     @PostMapping("/login")
-    public Result<User> login(@RequestBody Map map, HttpSession session) {
-        return userService.login(map, session);
+    public Result<User> login(@RequestBody Map map) {
+        return userService.login(map);
     }
 
 
     /**
      * 退出登录
      *
-     * @param request 删除存储用户id
      * @return 退出登录
      */
     @PostMapping("/loginout")
-    public Result<String> loginout(HttpServletRequest request) {
-        //清理Session中保存的当前登录用户的id
-        request.getSession().removeAttribute("user");
+    public Result<String> loginout() {
         return Result.success("退出成功");
     }
 }

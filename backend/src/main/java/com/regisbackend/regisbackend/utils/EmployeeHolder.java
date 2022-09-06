@@ -1,11 +1,10 @@
-package com.regisbackend.regisbackend.common;
+package com.regisbackend.regisbackend.utils;
 
 /**
- * 基于ThreadLocal封装工具类，用户保存和获取当前登录用户id
- *
  * @author 喵vamp
+ * @Description 基于ThreadLocal封装工具类，保存员工和获取当前登录员工信息
  */
-public class MyBaseContext {
+public class EmployeeHolder {
     /**
      * 当前线程的局部变量
      */

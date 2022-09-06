@@ -1,6 +1,7 @@
 package com.regisbackend.regisbackend.common;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.regisbackend.regisbackend.utils.EmployeeHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
@@ -25,8 +26,8 @@ public class MyMetaObjecthandler implements MetaObjectHandler {
         log.info("公共字段自动填充[insert]" + metaObject.toString());
         metaObject.setValue("createTime", LocalDateTime.now());
         metaObject.setValue("updateTime", LocalDateTime.now());
-        metaObject.setValue("createUser", MyBaseContext.getCurrentId());
-        metaObject.setValue("updateUser", MyBaseContext.getCurrentId());
+        metaObject.setValue("createUser", EmployeeHolder.getCurrentId());
+        metaObject.setValue("updateUser", EmployeeHolder.getCurrentId());
     }
 
     /**
@@ -39,6 +40,6 @@ public class MyMetaObjecthandler implements MetaObjectHandler {
         log.info("公共字段自动填充[update]" + metaObject.toString());
 
         metaObject.setValue("updateTime", LocalDateTime.now());
-        metaObject.setValue("updateUser", MyBaseContext.getCurrentId());
+        metaObject.setValue("updateUser", EmployeeHolder.getCurrentId());
     }
 }

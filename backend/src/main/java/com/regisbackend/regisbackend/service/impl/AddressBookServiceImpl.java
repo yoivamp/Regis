@@ -3,7 +3,7 @@ package com.regisbackend.regisbackend.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.regisbackend.regisbackend.common.MyBaseContext;
+import com.regisbackend.regisbackend.utils.EmployeeHolder;
 import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.dao.AddressBookMapper;
 import com.regisbackend.regisbackend.pojo.AddressBook;
@@ -29,7 +29,7 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
      */
     @Override
     public Result<AddressBook> saveAddressBook(AddressBook addressBook) {
-        addressBook.setUserId(MyBaseContext.getCurrentId());
+        addressBook.setUserId(EmployeeHolder.getCurrentId());
         log.info("addressBook:{}", addressBook);
         return this.save(addressBook) ? Result.success(addressBook) : null;
     }
@@ -44,7 +44,7 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
     public Result<AddressBook> setDefault(AddressBook addressBook) {
         log.info("addressBook:{}", addressBook);
         LambdaUpdateWrapper<AddressBook> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(AddressBook::getUserId, MyBaseContext.getCurrentId());
+        wrapper.eq(AddressBook::getUserId, EmployeeHolder.getCurrentId());
         wrapper.set(AddressBook::getIsDefault, 0);
 
         //SQL:update address_book set is_default = 0 where user_id = ?
@@ -68,7 +68,7 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
     @Override
     public Result<AddressBook> getDefault() {
         LambdaQueryWrapper<AddressBook> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(AddressBook::getUserId, MyBaseContext.getCurrentId());
+        queryWrapper.eq(AddressBook::getUserId, EmployeeHolder.getCurrentId());
         queryWrapper.eq(AddressBook::getIsDefault, 1);
 
         //SQL:select * from address_book where user_id = ? and is_default = 1
@@ -84,7 +84,7 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
      */
     @Override
     public Result<List<AddressBook>> listAddressBook(AddressBook addressBook) {
-        addressBook.setUserId(MyBaseContext.getCurrentId());
+        addressBook.setUserId(EmployeeHolder.getCurrentId());
         log.info("addressBook:{}", addressBook);
 
         //条件构造器

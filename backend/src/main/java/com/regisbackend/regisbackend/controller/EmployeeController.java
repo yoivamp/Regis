@@ -11,17 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 员工管理
- *
  * @author 喵vamp
+ * @Description 员工管理
  */
 @RestController
 @Slf4j
 @RequestMapping("/employee")
 public class EmployeeController {
-    /**
-     * employee的service的impl
-     */
+
     @Autowired
     private EmployeeService empService;
 
@@ -44,10 +41,10 @@ public class EmployeeController {
      * @return Result<String>
      */
     @PostMapping("/logout")
-    public Result<String> logout(HttpServletRequest request) {
+    public Result<String> logout() {
         //清理Session中保存的当前登录员工的id
-        request.getSession().removeAttribute("employee");
-        return Result.success("退出成功");
+        //request.getSession().removeAttribute("employee");
+        return empService.logout();
     }
 
     /**

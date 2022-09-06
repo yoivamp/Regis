@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.regisbackend.regisbackend.common.CustomException;
-import com.regisbackend.regisbackend.common.MyBaseContext;
+import com.regisbackend.regisbackend.utils.EmployeeHolder;
 import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.dao.OrderMapper;
 import com.regisbackend.regisbackend.dto.OrdersDto;
@@ -50,7 +50,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
     @Override
     public Result<String> submitOrders(Orders orders) {
         //获得当前用户id
-        Long userId = MyBaseContext.getCurrentId();
+        Long userId = EmployeeHolder.getCurrentId();
         //查询当前用户的购物车数据
         LambdaQueryWrapper<ShoppingCart> shoppingCartWrapper = new LambdaQueryWrapper<>();
         shoppingCartWrapper.eq(ShoppingCart::getUserId, userId);
@@ -140,7 +140,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
 
         //查询order表，并赋值给orderDto的page
         LambdaQueryWrapper<Orders> ordersWrapper = new LambdaQueryWrapper<>();
-        ordersWrapper.eq(Orders::getUserId, MyBaseContext.getCurrentId());
+        ordersWrapper.eq(Orders::getUserId, EmployeeHolder.getCurrentId());
         this.page(ordersPage, ordersWrapper);
         BeanUtils.copyProperties(ordersPage, ordersDtoPage);
 

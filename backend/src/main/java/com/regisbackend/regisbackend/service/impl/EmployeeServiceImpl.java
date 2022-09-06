@@ -10,11 +10,18 @@ import com.regisbackend.regisbackend.pojo.Employee;
 import com.regisbackend.regisbackend.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.concurrent.TimeUnit;
+
+import static com.regisbackend.regisbackend.utils.RedisKeys.EMPLOYEE_LOGIN_KEY;
+import static com.regisbackend.regisbackend.utils.RedisKeys.EMPLOYEE_LOGIN_TTL;
 
 /**
  * @author 喵vamp
@@ -22,7 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 @Slf4j
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements EmployeeService {
-
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 登录操作
@@ -33,30 +41,44 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
      */
     @Override
     public Result<Employee> login(HttpServletRequest request, Employee employee) {
-        //1、将页面提交的密码password进行md5加密处理
+        //将页面提交的密码password进行md5加密处理
         String password = employee.getPassword();
         password = DigestUtils.md5DigestAsHex(password.getBytes());
-        //2、根据页面提交的用户名username查询数据库
+        //根据页面提交的用户名username查询数据库
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Employee::getUsername, employee.getUsername());
         Employee emp = getOne(queryWrapper);
-        //3、如果没有查询到则返回登录失败结果
+        //如果没有查询到则返回登录失败结果
         if (emp == null) {
             return Result.error("账号不存在");
         }
-        //4、密码比对，如果不一致则返回登录失败结果
+        //密码比对，如果不一致则返回登录失败结果
         if (!emp.getPassword().equals(password)) {
             return Result.error("密码错误");
         }
-        //5、查看员工状态，如果为已禁用状态，则返回员工已禁用结果
+        //查看员工状态，如果为已禁用状态，则返回员工已禁用结果
         if (emp.getStatus() == 0) {
             return Result.error("账号已禁用");
         }
-        //6、登录成功，将员工id存入Session并返回登录成功结果
-        request.getSession().setAttribute("employee", emp.getId());
+        //登录成功，将员工id存入redis并返回登录成功结果
+        stringRedisTemplate.opsForValue()
+                .set(EMPLOYEE_LOGIN_KEY, emp.getName() + ":" + emp.getUsername());
+        //设置员工登录key有效期
+        stringRedisTemplate.expire(EMPLOYEE_LOGIN_KEY, EMPLOYEE_LOGIN_TTL, TimeUnit.MINUTES);
         return Result.success(emp);
     }
 
+
+    /**
+     * 退出登录
+     *
+     * @return 移除redis存储的key
+     */
+    @Override
+    public Result<String> logout() {
+        stringRedisTemplate.delete(EMPLOYEE_LOGIN_KEY);
+        return Result.success("退出成功");
+    }
 
     /**
      * 新增员工
@@ -123,4 +145,5 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         log.info(employee.toString());
         return updateById(employee) ? Result.success("员工信息修改成功") : null;
     }
+
 }

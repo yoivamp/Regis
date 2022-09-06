@@ -2,7 +2,7 @@ package com.regisbackend.regisbackend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.regisbackend.regisbackend.common.MyBaseContext;
+import com.regisbackend.regisbackend.utils.EmployeeHolder;
 import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.dao.ShoppingCartMapper;
 import com.regisbackend.regisbackend.pojo.ShoppingCart;
@@ -30,7 +30,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
     public Result<ShoppingCart> addShoppingCart(ShoppingCart shoppingCart) {
         log.info("购物车数据:{}", shoppingCart);
         //设置用户id，指定当前是哪个用户的购物车数据
-        shoppingCart.setUserId(MyBaseContext.getCurrentId());
+        shoppingCart.setUserId(EmployeeHolder.getCurrentId());
 
         //创建查询条件
         //查询当前菜品或者套餐是否在购物车中
@@ -80,7 +80,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
     @Override
     public Result<List<ShoppingCart>> listShoppingCart() {
         LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ShoppingCart::getUserId, MyBaseContext.getCurrentId());
+        queryWrapper.eq(ShoppingCart::getUserId, EmployeeHolder.getCurrentId());
         queryWrapper.orderByAsc(ShoppingCart::getCreateTime);
         return Result.success(this.list(queryWrapper));
     }
@@ -93,7 +93,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
     @Override
     public Result<String> cleanShoppingCart() {
         LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ShoppingCart::getUserId, MyBaseContext.getCurrentId());
+        queryWrapper.eq(ShoppingCart::getUserId, EmployeeHolder.getCurrentId());
         return this.remove(queryWrapper) ? Result.success("清空成功") : null;
     }
 
@@ -105,7 +105,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
      */
     public ShoppingCart getShoppingCart(ShoppingCart shoppingCart) {
         LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ShoppingCart::getUserId, MyBaseContext.getCurrentId());
+        queryWrapper.eq(ShoppingCart::getUserId, EmployeeHolder.getCurrentId());
         if (shoppingCart.getDishId() != null) {
             //清除的是菜品，查找菜品
             queryWrapper.eq(ShoppingCart::getDishId, shoppingCart.getDishId());
