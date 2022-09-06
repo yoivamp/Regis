@@ -1,0 +1,44 @@
+server:
+  port: 8080
+spring:
+  #数据库配置
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/regis?serverTimezone=UTC
+      username: root
+      password: root
+
+  #redis配置
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    #      password: root@123456
+    database: 0
+  #缓存配置
+  cache:
+    redis:
+      time-to-live: 1800000
+
+
+
+  #避免delete请求405错误
+  mvc:
+    hiddenmethod:
+      filter:
+
+#文件位置
+regis:
+  path: D:\pause\regis-img\
+
+
+#MP配置
+mybatis-plus:
+  configuration:
+    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+
