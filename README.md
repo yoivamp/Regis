@@ -4,7 +4,7 @@
 ## 1.项目说明
 
 -   采用SpringBoot、MyBatis-Plus框架，开发的前后端分离外卖点单系统，支持Redis缓存，使用nginx实现前后端分离
--   后台地址：http://192.168.119.139:8080/index.html
+-   后台地址：http://192.168.119.133:8080/backend/index.html
 -   
 
 
@@ -24,7 +24,7 @@
 -   核心框架：Spring Boot 2.6.6
 -   持久层框架：MyBatis Plus 3.4.2
 -   数据库连接池：Druid 1.2
--   日志管理：Logback
+-   日志管理：Log
 -   页面交互：Vue2.x
 
 
@@ -88,7 +88,7 @@ git --version
 
 -   192.168.119.130
 
-    ​				Nginx:部署前端项目，配置反向代理
+    ​				//Nginx:部署前端项目，配置反向代理
 
     ​				Redis：缓存中间件
 
