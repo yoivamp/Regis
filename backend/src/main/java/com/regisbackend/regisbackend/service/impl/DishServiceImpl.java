@@ -19,12 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -58,14 +58,15 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         //获取菜品id
         Long dishId = dishDto.getId();
         //设置菜品口味对应菜品id
-        List<DishFlavor> listFlavor = dishDto.getFlavors().stream()
+        List<DishFlavor> listFlavor = dishDto.getFlavors()
+                .stream()
                 .map(item -> {
                     item.setDishId(dishId);
                     return item;
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
         //保存菜品口味数据到菜品口味表dish_flavor
         dishFlavorService.saveBatch(listFlavor);
-
         return Result.success("添加菜品成功");
     }
 
@@ -150,24 +151,26 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
         queryWrapper.eq(Dish::getStatus, 1);
         queryWrapper.orderByDesc(Dish::getUpdateTime).orderByAsc(Dish::getSort);
+
         //执行查询获取菜品列表
         List<Dish> dishList = this.list(queryWrapper);
-
-        List<DishDto> dishDtoList = dishList.stream().map(item -> {
-            DishDto dishDto = new DishDto();
-            //设置dishDto的dish列表
-            BeanUtils.copyProperties(item, dishDto);
-            //设置dishDto的分类名称
-            Category category = categoryMapper.selectById(item.getCategoryId());
-            if (category != null) {
-                dishDto.setCategoryName(category.getName());
-            }
-            //设置dishDto的口味列表
-            LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(DishFlavor::getDishId, item.getId());
-            dishDto.setFlavors(dishFlavorService.list(wrapper));
-            return dishDto;
-        }).collect(Collectors.toList());
+        List<DishDto> dishDtoList = dishList.stream()
+                .map(item -> {
+                    DishDto dishDto = new DishDto();
+                    //设置dishDto的dish列表
+                    BeanUtils.copyProperties(item, dishDto);
+                    //设置dishDto的分类名称
+                    Category category = categoryMapper.selectById(item.getCategoryId());
+                    if (category != null) {
+                        dishDto.setCategoryName(category.getName());
+                    }
+                    //设置dishDto的口味列表
+                    LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();
+                    wrapper.eq(DishFlavor::getDishId, item.getId());
+                    dishDto.setFlavors(dishFlavorService.list(wrapper));
+                    return dishDto;
+                })
+                .collect(Collectors.toList());
 
         return Result.success(dishDtoList);
     }

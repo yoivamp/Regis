@@ -6,8 +6,6 @@ import com.regisbackend.regisbackend.common.Result;
 import com.regisbackend.regisbackend.pojo.Employee;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * @author 喵vamp
  */
@@ -15,11 +13,10 @@ public interface EmployeeService extends IService<Employee> {
     /**
      * 登录操作
      *
-     * @param request  存储session
      * @param employee 员工信息
      * @return Result<Employee>
      */
-    Result<Employee> login(HttpServletRequest request, Employee employee);
+    Result<Employee> login(Employee employee);
 
     /**
      * 新增员工
@@ -56,5 +53,10 @@ public interface EmployeeService extends IService<Employee> {
     @Transactional
     Result<String> updateEmployee(Employee employee);
 
+    /**
+     * 退出登录
+     *
+     * @return 移除redis存储的key
+     */
     Result<String> logout();
 }

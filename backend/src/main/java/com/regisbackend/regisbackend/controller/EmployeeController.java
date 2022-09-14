@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * @author 喵vamp
  * @Description 员工管理
@@ -25,19 +23,17 @@ public class EmployeeController {
     /**
      * 登录操作
      *
-     * @param request  存储session
      * @param employee 员工信息
      * @return Result<Employee>
      */
     @PostMapping("/login")
-    public Result<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
-        return empService.login(request, employee);
+    public Result<Employee> login(@RequestBody Employee employee) {
+        return empService.login(employee);
     }
 
     /**
      * 退出登录
      *
-     * @param request 清除session
      * @return Result<String>
      */
     @PostMapping("/logout")

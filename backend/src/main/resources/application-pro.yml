@@ -44,7 +44,6 @@ spring:
   redis:
     host: 192.168.119.130
     port: 6379
-    #      password: root@123456
     database: 0
   #缓存配置
   cache:
@@ -61,7 +60,6 @@ spring:
 
 #文件位置
 regis:
-  #  path: D:\pause\regis-img\
   path: /usr/local/img/regis-img/
 
 

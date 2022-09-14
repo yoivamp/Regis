@@ -45,9 +45,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.info("code={}", code);
             //调用阿里云提供的短信服务API完成发送短信
             //SMSUtils.sendMessage("瑞吉外卖","",phone,code);
+
             //将生成的验证码缓存到Redis中，并且设置有效期
-            stringRedisTemplate.opsForValue().
-                    set(USER_LOGIN_CODE_KEY + phone, code, USER_LOGIN_CODE_TTL, TimeUnit.MINUTES);
+            stringRedisTemplate.opsForValue()
+                    .set(USER_LOGIN_CODE_KEY + phone, code, USER_LOGIN_CODE_TTL, TimeUnit.MINUTES);
             return Result.success("手机验证码短信发送成功");
         }
         return Result.error("短信发送失败");
@@ -83,7 +84,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 this.save(user);
             }
             //如果用户登录成功，删除Redis中缓存的验证码
-            stringRedisTemplate.delete(phone);
+            stringRedisTemplate.delete(USER_LOGIN_CODE_KEY + phone);
             //登录成功存储一份用户信息到redis
             stringRedisTemplate.opsForValue().set(USER_LOGINED_KEY, user.getPhone());
             //设置用户信息有效期

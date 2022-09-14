@@ -57,17 +57,13 @@ public class LoginCheckFilter implements Filter {
             filterChain.doFilter(request, response);
             return;
         }
-        //判断员工登录状态，如果已登录，则直接放行
-        if (isEmployeeLogin(EMPLOYEE_LOGIN_KEY)) {
-            filterChain.doFilter(request, response);
-        }
-        //判断用户登录状态，如果已登录，则直接放行
-        else if (isUserLogin(USER_LOGINED_KEY)) {
-            filterChain.doFilter(request, response);
-        } else {
-            //未登录，通过输出流方式向客户端页面响应数据
+        //判断是否有登录，如果已登录，则直接放行
+        if (!isEmployeeLogin(EMPLOYEE_LOGIN_KEY) && !isUserLogin(USER_LOGINED_KEY)) {
+            //两者均未登录，通过输出流方式向客户端页面响应数据
             log.info("用户未登录");
             response.getWriter().write(JSON.toJSONString(Result.error("NOTLOGIN")));
+        } else {
+            filterChain.doFilter(request, response);
         }
     }
 
@@ -88,7 +84,7 @@ public class LoginCheckFilter implements Filter {
     }
 
     /**
-     * 验证登录
+     * 验证员工登录
      *
      * @param key 员工登录的key
      * @return 登录结果
@@ -102,6 +98,12 @@ public class LoginCheckFilter implements Filter {
         return false;
     }
 
+    /**
+     * 验证用户登录
+     *
+     * @param key 用户登录key
+     * @return 登录结果
+     */
     public boolean isUserLogin(String key) {
         String str = stringRedisTemplate.opsForValue().get(key);
         if (StrUtil.isNotBlank(str)) {

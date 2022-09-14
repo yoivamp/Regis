@@ -16,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
 import java.util.concurrent.TimeUnit;
 
 import static com.regisbackend.regisbackend.utils.RedisKeys.EMPLOYEE_LOGIN_KEY;
@@ -35,12 +33,11 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     /**
      * 登录操作
      *
-     * @param request  存储session
      * @param employee 员工信息
      * @return Result<Employee>
      */
     @Override
-    public Result<Employee> login(HttpServletRequest request, Employee employee) {
+    public Result<Employee> login(Employee employee) {
         //将页面提交的密码password进行md5加密处理
         String password = employee.getPassword();
         password = DigestUtils.md5DigestAsHex(password.getBytes());
